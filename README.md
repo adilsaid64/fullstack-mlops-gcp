@@ -1,1 +1,1 @@
-Playground repo where I play around with different concepts and tools related to ML/Data Engineering. Not really full projects, but small little tasks.
+Playground repo where I play around with different concepts and tools related to ML Engineering and MLOps.
