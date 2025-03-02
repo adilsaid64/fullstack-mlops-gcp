@@ -1,0 +1,15 @@
+# Sprint One: Infrastructure for experiment tracking
+
+- Setup terraform
+- EKS
+- MLFlow
+- ZenML
+- LakeFS
+- Basic ML Model
+
+# Sprint Two: Model Deployment and Serving
+- Setup KServe
+- Deploy models and be able to serve
+
+# Sprint Three: Monitoring
+- Data Drift
