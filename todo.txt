@@ -6,6 +6,7 @@
 - ZenML
 - LakeFS
 - Basic ML Model
+- Basic CICD with GitHub Actions
 
 # Sprint Two: Model Deployment and Serving
 - Setup KServe
