@@ -1,1 +1,3 @@
-Playground repo where I play around with different concepts and tools related to ML Engineering and MLOps.
+# Fullstack MLOps AWS
+
+Purpose of this project is to provide a template to setting up an MLOps stack on AWS using mostly open source available tools.
