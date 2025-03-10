@@ -7,3 +7,8 @@ variable "private_subnets" {
   description = "List of private subnets for EKS worker nodes"
   type        = list(string)
 }
+
+variable "cluster_name" {
+  description = "Name of EKS cluster"
+  type        = string
+}
