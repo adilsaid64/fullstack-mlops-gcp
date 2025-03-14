@@ -1,7 +1,8 @@
 # Sprint One: Infrastructure for experiment tracking
 
-- Setup terraform
-- EKS
+- Setup terraform DONE
+- EKS Cluster - DONE
+- EKS Node - Inprogrss
 - MLFlow
 - ZenML
 - LakeFS
