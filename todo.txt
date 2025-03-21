@@ -1,5 +1,6 @@
 # Sprint One: Infrastructure for experiment tracking
 checkout terragrunt and move over to using that
+check for last open source version of terraform it might be: tfenv install 1.5.7 or 1.5.5 need to double check
 setup  terraform with tfenv
 - Setup terraform DONE
 - EKS Cluster - DONE
