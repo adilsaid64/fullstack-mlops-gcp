@@ -1,5 +1,5 @@
 # Sprint One: Infrastructure for experiment tracking
-
+checkout terragrunt and move over to using that
 - Setup terraform DONE
 - EKS Cluster - DONE
 - EKS Node - Inprogrss
