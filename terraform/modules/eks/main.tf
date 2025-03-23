@@ -3,7 +3,7 @@ module "eks" {
   version = "~> 20.31"
 
   cluster_name    = var.cluster_name
-  cluster_version = "1.31"
+  cluster_version = var.cluster_version
 
   vpc_id     = var.vpc_id
   subnet_ids = var.private_subnets
@@ -25,8 +25,11 @@ module "eks" {
     vpc-cni    = { resolve_conflicts = "OVERWRITE" }
   }
 
-  tags = {
-    Environment = "dev"
-    Terraform   = "true"
-  }
+  tags = merge(
+    {
+      "Name"      = var.cluster_name
+      "Terraform" = "true"
+    },
+    var.tags
+  )
 }

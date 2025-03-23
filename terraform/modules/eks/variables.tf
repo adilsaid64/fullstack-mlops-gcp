@@ -12,3 +12,14 @@ variable "cluster_name" {
   description = "Name of EKS cluster"
   type        = string
 }
+
+variable "cluster_version" {
+  description = "EKS Kubernetes version"
+  type        = string
+}
+
+variable "tags" {
+  description = "A map of tags to add to all resources"
+  type        = map(string)
+  default     = {}
+}
