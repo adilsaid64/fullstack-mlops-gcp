@@ -18,10 +18,10 @@ module "eks" {
   # Adds the current caller identity as an administrator via cluster access entry
   enable_cluster_creator_admin_permissions = true
 
-  cluster_compute_config = {
-    enabled    = true
-    node_pools = ["general-purpose"]
-  }
+  # cluster_compute_config = {
+  #   enabled    = true
+  #   node_pools = ["general-purpose"]
+  # }
 
   cluster_addons = {
     coredns    = { resolve_conflicts = "OVERWRITE" }
