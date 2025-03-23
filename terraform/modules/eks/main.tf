@@ -24,11 +24,13 @@ module "eks" {
   #   node_pools = ["general-purpose"]
   # }
 
-  cluster_addons = {
-    coredns    = { resolve_conflicts = "OVERWRITE" }
-    kube-proxy = { resolve_conflicts = "OVERWRITE" }
-    vpc-cni    = { resolve_conflicts = "OVERWRITE" }
-  }
+  # # run  terragrunt run-all apply first, then uncomment lines 28-32 and run the command again
+  # # because to install addons, eks needs to be provisioned first
+  # cluster_addons = {
+  #   coredns    = { resolve_conflicts = "OVERWRITE" }
+  #   kube-proxy = { resolve_conflicts = "OVERWRITE" }
+  #   vpc-cni    = { resolve_conflicts = "OVERWRITE" }
+  # }
 
   tags = merge(
     {
