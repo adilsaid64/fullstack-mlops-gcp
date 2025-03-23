@@ -12,8 +12,9 @@ module "eks" {
   vpc_id     = var.vpc_id
   subnet_ids = var.private_subnets
 
-  cluster_endpoint_public_access = false # keep api private
-  enable_irsa                    = true  # allow aws integrations
+  cluster_endpoint_public_access  = true # keep api private
+  enable_irsa                     = true # allow aws integrations
+  cluster_endpoint_private_access = true
 
   # Adds the current caller identity as an administrator via cluster access entry
   enable_cluster_creator_admin_permissions = true
