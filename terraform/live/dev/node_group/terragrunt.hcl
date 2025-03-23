@@ -13,9 +13,16 @@ terraform {
 inputs = {
   node_group_name = "dev-mlops-group"
   cluster_name    = dependency.eks.outputs.cluster_name
+  cluster_version = "1.31"
   private_subnets = dependency.eks.outputs.private_subnets
   desired_size    = 1
   max_size        = 1
   min_size        = 1
   instance_types  = ["t3.medium"]
+
+  tags = {
+    Environment = "dev"
+    Project     = "mlops"
+    Terraform   = "true"
+  }
 }
