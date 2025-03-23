@@ -1,3 +1,7 @@
+terraform {
+  backend "s3" {}
+}
+
 module "vpc" {
   # using the official aws vpc module from terraform registry
   source  = "terraform-aws-modules/vpc/aws"

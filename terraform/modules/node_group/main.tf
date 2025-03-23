@@ -1,3 +1,7 @@
+terraform {
+  backend "s3" {}
+}
+
 module "eks_managed_node_group" {
   source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
 
@@ -7,8 +11,10 @@ module "eks_managed_node_group" {
 
   subnet_ids = var.private_subnets
 
-  cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
-  vpc_security_group_ids            = [module.eks.node_security_group_id]
+  cluster_primary_security_group_id = var.cluster_primary_security_group_id
+  vpc_security_group_ids            = [var.node_security_group_id]
+
+  cluster_service_cidr = var.cluster_service_cidr
 
   min_size     = var.min_size
   max_size     = var.max_size

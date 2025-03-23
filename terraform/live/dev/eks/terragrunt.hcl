@@ -1,10 +1,11 @@
 include {
-  path = find_in_parent_folders()
+  path = find_in_parent_folders("root.hcl")
 }
 
-dependencies {
-  paths = ["../vpc"]
+dependency "vpc" {
+  config_path = "../vpc"
 }
+
 
 terraform {
   source = "../../../modules/eks"

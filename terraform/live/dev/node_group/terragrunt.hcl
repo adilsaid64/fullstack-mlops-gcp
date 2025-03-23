@@ -1,9 +1,13 @@
 include {
-  path = find_in_parent_folders()
+  path = find_in_parent_folders("root.hcl")
 }
 
-dependencies {
-  paths = ["../eks"]
+dependency "eks" {
+  config_path = "../eks"
+}
+
+dependency "vpc" {
+  config_path = "../vpc"
 }
 
 terraform {
@@ -14,7 +18,8 @@ inputs = {
   node_group_name = "dev-mlops-group"
   cluster_name    = dependency.eks.outputs.cluster_name
   cluster_version = "1.31"
-  private_subnets = dependency.eks.outputs.private_subnets
+  cluster_service_cidr = dependency.eks.outputs.cluster_service_cidr
+  private_subnets = dependency.vpc.outputs.private_subnets
   desired_size    = 1
   max_size        = 1
   min_size        = 1
@@ -25,4 +30,7 @@ inputs = {
     Project     = "mlops"
     Terraform   = "true"
   }
+  node_security_group_id = dependency.eks.outputs.node_security_group_id
+  cluster_primary_security_group_id = dependency.eks.outputs.cluster_primary_security_group_id
+
 }

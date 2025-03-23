@@ -13,6 +13,11 @@ variable "cluster_version" {
   type        = string
 }
 
+variable "cluster_service_cidr" {
+  description = "The Kubernetes service CIDR used by the cluster"
+  type        = string
+}
+
 variable "private_subnets" {
   description = "Private subsets"
   type        = list(string)
@@ -48,4 +53,14 @@ variable "labels" {
   description = "Labels to apply to node group"
   type        = map(string)
   default     = {}
+}
+
+variable "cluster_primary_security_group_id" {
+  description = "The primary security group ID of the EKS cluster"
+  type        = string
+}
+
+variable "node_security_group_id" {
+  description = "The node security group ID of the EKS cluster"
+  type        = string
 }
