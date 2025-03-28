@@ -1,6 +1,6 @@
 # 1️⃣ Infrastructure Setup
 
-This guide walks you through initializing and deploying your AWS infrastructure using **Terraform** + **Terragrunt**.
+This guide walks you through initialising and deploying your AWS infrastructure using **Terraform** + **Terragrunt**.
 
 ---
 
