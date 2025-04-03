@@ -1,19 +1,12 @@
-# Sprint One: Infrastructure for experiment tracking
-checkout terragrunt and move over to using that
-check for last open source version of terraform it might be: tfenv install 1.5.7 or 1.5.5 need to double check
-setup  terraform with tfenv
-- Setup terraform DONE
-- EKS Cluster - DONE
-- EKS Node - Inprogrss
-- MLFlow
-- ZenML
-- LakeFS
-- Basic ML Model
-- Basic CICD with GitHub Actions
+Whats done:
+1. EKS infrastructure provisioned with Terraform + Terragrunt
+2. Kubernetes application manifests organised in a Kustomize compatible folder structure (`k8s/`), with separate overlays different environments
 
-# Sprint Two: Model Deployment and Serving
-- Setup KServe
-- Deploy models and be able to serve
-
-# Sprint Three: Monitoring
-- Data Drift
+Todo:
+1. Setup a zenml stack to run in EKS, and connected to MLFlow
+2. Deploy a fast api endpoint to cluster
+3. Setup a complete local stack that runs on a self hosted MySQL DB, and Minio object store (Dev stack)
+4. Provision a MySQL RDS on AWS and connect MLFlow and ZenML to this RDS for a prod environment (Prod stack)
+5. (3, 4) to make use of Kustomize compatibile manifests. Create an overlap within K8s to easily provision the dev stack with one command
+6. Setup a simple model endpoint for inference
+7. Monitoring for data drift and model drift
