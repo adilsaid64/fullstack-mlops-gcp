@@ -2,16 +2,18 @@
 
 Purpose of this project is to provide a template to setting up an MLOps stack on AWS EKS using mostly open source available tools.
 
+This repo focuses purely on setting up the infrastructure backbone for AI/ML/LLM applications, which you can then tailor to your own business logic and use case.
+
 ## Tools
 
-MLflow - Model Registry
-MLflow - Experiment Tracker
-LakeFS - Data Versioning 
-ZenML - Pipeline Orchestrator
-MySQL - RDS backend for MLFlow and ZenML
-S3 - Artifact Storage for ZenML and MLflow
-Terraform - IaC
-BentoML/KServe (Still deciding) - Model Deployment
+- MLflow - Model Registry
+- MLflow - Experiment Tracker
+- LakeFS - Data Versioning 
+- ZenML - Pipeline Orchestrator
+- MySQL - RDS backend for MLFlow and ZenML
+- S3 - Artifact Storage for ZenML and MLflow
+- Terraform and Terragrunt - IaC
+- BentoML/KServe (Still deciding) - Model Deployment
 
 # 📚 Documentation Index
 
