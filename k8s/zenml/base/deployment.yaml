@@ -16,7 +16,7 @@ spec:
         - name: zenml
           image: zenmldocker/zenml-server:latest
           ports:
-            - containerPort: 8000
+            - containerPort: 8080
           volumeMounts:
             - name: zenml-data
               mountPath: /zenml
