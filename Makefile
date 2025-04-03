@@ -8,6 +8,3 @@ deploy:
 
 restart:
 	kubectl rollout restart deployment/$(APP)
-
-logs:
-	kubectl logs -l app=$(APP) --tail=100 -f
