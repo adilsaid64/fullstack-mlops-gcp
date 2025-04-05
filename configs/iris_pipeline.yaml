@@ -1,0 +1,14 @@
+enable_cache: False
+
+# environment configuration
+settings:
+  docker:
+    required_integrations:
+      - sklearn
+      - pandas
+    requirements:
+      - shap
+
+# pipeline configuration
+parameters:
+  run_type: experiment
