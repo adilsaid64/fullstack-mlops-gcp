@@ -3,12 +3,11 @@ from sklearn.model_selection import train_test_split
 from zenml import step
 import numpy as np
 
-from typing import Tuple
 from typing_extensions import Annotated
 
 
 @step
-def load_data() -> Tuple[
+def load_data() -> tuple[
     Annotated[np.ndarray, "X_train"],
     Annotated[np.ndarray, "X_test"],
     Annotated[np.ndarray, "y_train"],

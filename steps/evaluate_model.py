@@ -3,7 +3,7 @@ from sklearn.metrics import accuracy_score
 from zenml import step
 import numpy as np
 
-from typing_extensions import Annotated
+from typing import Annotated
 
 
 @step
