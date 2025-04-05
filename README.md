@@ -12,8 +12,9 @@ This repo focuses purely on setting up the infrastructure backbone for AI/ML/LLM
 - ZenML - Pipeline Orchestrator
 - MySQL - RDS backend for MLFlow and ZenML
 - S3 - Artifact Storage for ZenML and MLflow
-- Terraform and Terragrunt - IaC
 - BentoML/KServe (Still deciding) - Model Deployment
+- Terraform - Infrastructure as Code (IaC)
+- Terragrunt - Terraform Configuration Management
 
 # 📚 Documentation Index
 
