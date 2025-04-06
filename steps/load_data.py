@@ -6,7 +6,7 @@ import numpy as np
 from typing_extensions import Annotated
 
 
-@step
+@step  # type: ignore[misc]
 def load_data() -> tuple[
     Annotated[np.ndarray, "X_train"],
     Annotated[np.ndarray, "X_test"],

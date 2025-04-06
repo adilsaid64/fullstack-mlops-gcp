@@ -15,13 +15,13 @@ class ItemResponse(BaseModel):
     item: Item
 
 
-@app.get("/items/{item_id}", response_model=ItemResponse)
+@app.get("/items/{item_id}", response_model=ItemResponse)  # type: ignore[misc]
 def get_item(item_id: int) -> ItemResponse:
     dummy_item = Item(id=item_id, data="Example Data")
     return ItemResponse(message="Item fetched successfully", item=dummy_item)
 
 
-@app.post("/items/", response_model=ItemResponse)
+@app.post("/items/", response_model=ItemResponse)  # type: ignore[misc]
 def create_item(item: Item) -> ItemResponse:
     return ItemResponse(message="Item created successfully", item=item)
 

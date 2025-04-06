@@ -7,7 +7,7 @@ from zenml.integrations.mlflow.steps.mlflow_registry import (
 )
 
 
-@pipeline
+@pipeline  # type: ignore[misc]
 def iris_pipeline(run_type: str) -> None:
     """Basic pipeline for training an Iris classification model"""
     X_train, X_test, y_train, y_test = load_data()

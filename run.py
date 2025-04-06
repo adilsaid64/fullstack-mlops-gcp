@@ -3,14 +3,14 @@ import click
 import os
 
 
-@click.command()
+@click.command()  # type: ignore[misc]
 @click.option(
     "--pipeline",
     type=str,
     required=True,
     help="Pipeline to run, e.g. 'iris-pipeline'",
-)
-def main(pipeline: str):
+)  # type: ignore[misc]
+def main(pipeline: str) -> None:
 
     config_folder = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),

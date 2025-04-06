@@ -9,7 +9,7 @@ from typing import Annotated
 experiment_tracker = Client().active_stack.experiment_tracker
 
 
-@step(experiment_tracker=experiment_tracker.name)
+@step(experiment_tracker=experiment_tracker.name)  # type: ignore[misc]
 def train_model(
     X_train: Annotated[np.ndarray, "X_train"],
     y_train: Annotated[np.ndarray, "y_train"],
