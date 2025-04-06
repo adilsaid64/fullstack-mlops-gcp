@@ -4,9 +4,11 @@ import uvicorn
 
 app = FastAPI()
 
+
 class Item(BaseModel):
     id: int
     data: str = Field(..., example="Test Example")
+
 
 class ItemResponse(BaseModel):
     message: str

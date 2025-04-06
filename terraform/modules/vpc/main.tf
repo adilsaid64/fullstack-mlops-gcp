@@ -7,7 +7,7 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "~> 5.0"
 
-  # vpc name and cidr block, so vpc has ip address ranging from 10.0.0.0 to 10.0.255.255 
+  # vpc name and cidr block, so vpc has ip address ranging from 10.0.0.0 to 10.0.255.255
   name = var.vpc_name
   cidr = var.cidr
 

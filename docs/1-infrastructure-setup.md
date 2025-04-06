@@ -10,7 +10,7 @@ The infrastructure is structured with the standard **modular + environment** lay
 
 - `modules/`: Reusable Terraform modules (VPC, EKS, Node Group)
 - `live/`: Environment-specific configurations (e.g., dev, prod)
-- `live/dev/`: Contains Terragrunt configurations for each component  
+- `live/dev/`: Contains Terragrunt configurations for each component
   *(VPC → EKS → Node Group dependencies are already setup up)*
 
 ---
@@ -46,7 +46,7 @@ Run the following command to create them:
 
 This creates the backend s3 table.
 ```bash
-aws s3api create-bucket --bucket terraform-state-full-stack-mlops --region eu-west-2 --create-bucket-configuration LocationConstraint=eu-west-2 
+aws s3api create-bucket --bucket terraform-state-full-stack-mlops --region eu-west-2 --create-bucket-configuration LocationConstraint=eu-west-2
 ```
 
 This creates the backend dynamodb table.
@@ -72,14 +72,14 @@ terragrunt run-all apply
 
 Terragrunt will:
 
-✅ Automatically initialize all components  
-✅ Respect dependency order (VPC → EKS → Node Group)  
-✅ Use remote state from `root.hcl`  
+✅ Automatically initialize all components
+✅ Respect dependency order (VPC → EKS → Node Group)
+✅ Use remote state from `root.hcl`
 
 This can take around 20-30 minutes to complete.
 
-Once done you can bring the EKS add-ons back in 
-[EKS Module ](../terraform/modules/eks/main.tf) lines 29-33 and run: 
+Once done you can bring the EKS add-ons back in
+[EKS Module ](../terraform/modules/eks/main.tf) lines 29-33 and run:
 
 ```bash
 terragrunt run-all apply
@@ -102,7 +102,6 @@ kubectl get nodes
 
 ## ✅ Success Check
 
-- `kubectl get nodes` → You should see EKS worker nodes  
-- AWS Console → Check EKS, VPC, Subnets  
+- `kubectl get nodes` → You should see EKS worker nodes
+- AWS Console → Check EKS, VPC, Subnets
 - Terraform state is in your configured S3 backend
-

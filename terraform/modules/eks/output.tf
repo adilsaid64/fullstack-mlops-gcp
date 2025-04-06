@@ -16,4 +16,3 @@ output "node_security_group_id" {
 output "cluster_service_cidr" {
   value = module.eks.cluster_service_cidr
 }
-
