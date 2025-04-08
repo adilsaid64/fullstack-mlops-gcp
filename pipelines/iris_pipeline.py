@@ -1,7 +1,5 @@
 from zenml import pipeline
-from steps.evaluate_model import evaluate_model
-from steps.load_data import load_data
-from steps.train_model import train_model
+from steps.iris_pipeline_steps import load_data, train_model, evaluate_model
 from zenml.integrations.mlflow.steps.mlflow_registry import (
     mlflow_register_model_step,
 )
