@@ -24,4 +24,3 @@ Please follow the guides in this order:
 
 1. [0 - Prerequisites](docs/0-prerequisites.md)
 2. [1 - Infrastructure Setup](docs/1-infrastructure-setup.md)
-3. [2 - ZenML Stack Setup](docs/2-zenml-setup.md)
