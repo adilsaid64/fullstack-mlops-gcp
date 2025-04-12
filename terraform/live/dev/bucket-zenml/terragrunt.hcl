@@ -8,7 +8,7 @@ terraform {
 }
 
 inputs = {
-  bucket_name    = "dev-zenml"
+  bucket_name    = "dev-zenml-full-stack-mlops"
 
   tags = {
     Environment = "dev"

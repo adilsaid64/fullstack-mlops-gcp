@@ -8,7 +8,7 @@ terraform {
 }
 
 inputs = {
-  bucket_name    = "dev-mlflow"
+  bucket_name    = "dev-mlflow-full-stack-mlops"
 
   tags = {
     Environment = "dev"
