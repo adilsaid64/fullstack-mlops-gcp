@@ -12,9 +12,9 @@ experiment_tracker = Client().active_stack.experiment_tracker
 
 @step(experiment_tracker=experiment_tracker.name)  # type: ignore[misc]
 def evaluate_model(
-    model: Annotated[LogisticRegression, "trained_model"],
-    X_test: Annotated[np.ndarray, "X_test"],
-    y_test: Annotated[np.ndarray, "y_test"],
+    model: LogisticRegression,
+    X_test: np.ndarray,
+    y_test: np.ndarray,
 ) -> Annotated[float, "accuracy"]:
     predictions: np.ndarray = model.predict(X_test)
     accuracy: float = accuracy_score(y_test, predictions)

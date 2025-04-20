@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split
 from zenml import step
 import numpy as np
 
-from typing_extensions import Annotated
+from typing import Annotated
 
 
 @step  # type: ignore[misc]

@@ -11,4 +11,4 @@ settings:
 
 # pipeline configuration
 parameters:
-  run_type: experiment
+  run_type: "dev"

@@ -17,6 +17,9 @@ spec:
           image: zenmldocker/zenml-server:latest
           ports:
             - containerPort: 8080
+          env:
+            - name: ZENML_ENABLE_IMPLICIT_AUTH_METHODS
+              value: "true"
           volumeMounts:
             - name: zenml-data
               mountPath: /zenml

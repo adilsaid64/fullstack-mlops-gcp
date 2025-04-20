@@ -8,7 +8,7 @@ import os
     "--pipeline",
     type=str,
     required=True,
-    help="Pipeline to run, e.g. 'iris-pipeline'",
+    help="Pipeline to run, e.g. 'iris'",
 )  # type: ignore[misc]
 def main(pipeline: str) -> None:
 
@@ -17,7 +17,7 @@ def main(pipeline: str) -> None:
         "configs",
     )
 
-    if pipeline == "iris-pipeline":
+    if pipeline == "iris":
         print("Running iris classification pipeline...")
         from pipelines.iris_pipeline import iris_pipeline
 

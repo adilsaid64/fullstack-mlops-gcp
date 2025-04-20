@@ -11,8 +11,8 @@ experiment_tracker = Client().active_stack.experiment_tracker
 
 @step(experiment_tracker=experiment_tracker.name)  # type: ignore[misc]
 def train_model(
-    X_train: Annotated[np.ndarray, "X_train"],
-    y_train: Annotated[np.ndarray, "y_train"],
+    X_train: np.ndarray,
+    y_train: np.ndarray,
 ) -> Annotated[LogisticRegression, "trained_model"]:
     mlflow.sklearn.autolog()
     model = LogisticRegression(max_iter=200)
