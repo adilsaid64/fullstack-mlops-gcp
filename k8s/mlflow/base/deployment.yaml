@@ -28,6 +28,13 @@ spec:
             - /mlflow/artifacts
           ports:
             - containerPort: 5000
+          env:
+            - name: MLFLOW_TRACKING_USERNAME
+              value: "admin"
+            - name: MLFLOW_TRACKING_PASSWORD
+              value: "password"
+            - name: MLFLOW_FLASK_SERVER_SECRET_KEY
+              value: "password_key"
           volumeMounts:
             - name: mlflow-data
               mountPath: /mlflow
