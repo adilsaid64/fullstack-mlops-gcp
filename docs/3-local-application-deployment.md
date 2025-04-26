@@ -64,6 +64,23 @@ You should see pods, services, and deployments for both MLflow and ZenML running
 
 ---
 
+## Enable local registry7
+
+This will allow you to push images to a local registry. Useful if you want to mimick something like ECR locally.
+
+```bash
+minikube addons enable registry 
+```
+
+Then in dev deploy scripts you can push images to: 
+
+```bash
+docker tag myapp localhost:80/myapp:latest
+docker push localhost:80/myapp:latest
+```
+
+after portfowarding
+
 ## 🌐 Accessing Services
 
 To access services locally:
@@ -73,6 +90,7 @@ To access services locally:
 ```bash
 kubectl port-forward svc/mlflow 5000:5000
 kubectl port-forward svc/zenml 8080:8080
+kubectl port-forward --n kube-system svc/kubernetes-dashboard 80:80
 ```
 
 Now you can visit:
