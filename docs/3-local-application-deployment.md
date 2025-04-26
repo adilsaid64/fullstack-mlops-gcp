@@ -64,7 +64,7 @@ You should see pods, services, and deployments for both MLflow and ZenML running
 
 ---
 
-## Enable local registry7
+## Enable Local Registry
 
 This will allow you to push images to a local registry. Useful if you want to mimick something like ECR locally.
 
