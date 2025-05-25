@@ -29,3 +29,10 @@ module "vpc" {
     var.tags
   )
 }
+
+resource "aws_db_subnet_group" "this" {
+  name       = "${var.vpc_name}-db-subnet-group"
+  subnet_ids = module.vpc.private_subnets
+
+  tags = var.tags
+}

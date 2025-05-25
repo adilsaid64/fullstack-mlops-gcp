@@ -25,12 +25,13 @@ inputs = {
   min_size        = 1
   instance_types  = ["t3.medium"]
 
+  node_security_group_id = dependency.eks.outputs.node_security_group_id
+  cluster_primary_security_group_id = dependency.eks.outputs.cluster_primary_security_group_id
+
   tags = {
     Environment = "dev"
     Project     = "mlops"
     Terraform   = "true"
   }
-  node_security_group_id = dependency.eks.outputs.node_security_group_id
-  cluster_primary_security_group_id = dependency.eks.outputs.cluster_primary_security_group_id
 
 }
