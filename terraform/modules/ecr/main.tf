@@ -11,10 +11,5 @@ resource "aws_ecr_repository" "this" {
     scan_on_push = true
   }
 
-  tags = merge(
-    {
-      "Name" = var.ecr_repo_name
-    },
-    var.tags
-  )
+  tags = var.tags
 }

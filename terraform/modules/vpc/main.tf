@@ -22,12 +22,7 @@ module "vpc" {
   enable_nat_gateway = true
   single_nat_gateway = true # creates only a single nat gateway
 
-  tags = merge(
-    {
-      "Name" = var.vpc_name
-    },
-    var.tags
-  )
+  tags = var.tags
 }
 
 resource "aws_db_subnet_group" "this" {
