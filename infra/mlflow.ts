@@ -1,11 +1,13 @@
 import * as k8s from "@pulumi/kubernetes";
-import * as helm from "@pulumi/kubernetes/helm/v3";
+import * as helm from "@pulumi/kubernetes/helm/v4";
+import * as pulumi from "@pulumi/pulumi";
 
 interface DeployMLflowArgs {
+    name: string;
     provider: k8s.Provider;
     db: {
         dialectDriver: string;
-        host: string;
+        host: pulumi.Input<string>;
         port: number;
         user: string;
         password: string;
@@ -13,7 +15,7 @@ interface DeployMLflowArgs {
     };
     artifactBackend: "minio" | "gcs";
     minio?: {
-        host: string;
+        host: pulumi.Input<string>;
         port: number;
         accessKey: string;
         secretKey: string;
@@ -37,6 +39,9 @@ export function deployMLflow(args: DeployMLflowArgs) {
             user: args.db.user,
             password: args.db.password,
             database: args.db.database,
+        },
+        minio: {
+            enabled: false,
         },
         tracking: {
             enabled: true,
@@ -71,14 +76,15 @@ export function deployMLflow(args: DeployMLflowArgs) {
         };
     }
 
-    const mlflowHelm = new helm.Chart("mlflow", {
+    const chart = new helm.Chart(args.name, {
         chart: "mlflow",
         version: "5.1.4",
-        fetchOpts: {
+        repositoryOpts: {
             repo: "https://charts.bitnami.com/bitnami",
         },
         values: chartValues,
     }, { provider: args.provider });
 
-    return mlflowHelm;
+
+    return { chart };
 }

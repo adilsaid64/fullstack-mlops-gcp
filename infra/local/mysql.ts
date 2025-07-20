@@ -1,7 +1,8 @@
 import * as k8s from "@pulumi/kubernetes";
-import * as helm from "@pulumi/kubernetes/helm/v3";
+import * as helm from "@pulumi/kubernetes/helm/v4";
 
 interface DeployMySqlArgs {
+    name: string;
     provider: k8s.Provider;
     rootPassword: string;
     user: string;
@@ -11,6 +12,7 @@ interface DeployMySqlArgs {
 
 export function deployMySql(args: DeployMySqlArgs) {
     const chartValues = {
+        fullnameOverride: args.name,
         auth: {
             rootPassword: args.rootPassword,
             username: args.user,
@@ -30,14 +32,14 @@ export function deployMySql(args: DeployMySqlArgs) {
         }
     };
 
-    const mySqlHelm = new helm.Chart("mysql", {
+    const chart = new helm.Chart(args.name, {
         chart: "mysql",
         version: "13.0.4",
-        fetchOpts: {
+        repositoryOpts: {
             repo: "https://charts.bitnami.com/bitnami",
         },
         values: chartValues,
     }, { provider: args.provider });
 
-    return mySqlHelm;
+    return { chart };
 }
