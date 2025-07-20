@@ -1,5 +1,0 @@
-.venv
-terraform/.terraform**
-.terragrunt-cache
-**.terraform.lock.hcl
-**/__pycache__
