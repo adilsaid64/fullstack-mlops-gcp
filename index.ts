@@ -31,8 +31,11 @@ const mlflowDeployment = deployMLflow({
     name: `mlflow-${pulumi.getStack()}`,
     provider: k8sProvider,
     artifactBackend: "minio",
+    auth: {
+        adminUsername: "admin",
+        adminPassword: "password",
+    },
     db: {
-        dialectDriver: "mysql",
         host: dbHost,
         port: 3306,
         user: "admin",
@@ -45,7 +48,8 @@ const mlflowDeployment = deployMLflow({
         host: minioHost,
         port: 9000,
         bucket: "mlflow"
-    }
+    },
+    dependsOn: [mySqlDeployment.chart, minioDeployment.chart]
 });
 
 const phpMyAdmin = deployPhpMyAdmin({
@@ -55,4 +59,5 @@ const phpMyAdmin = deployPhpMyAdmin({
     mysqlPort: 3306,
     mysqlUser: "admin",
     mysqlPassword: "password",
+    dependsOn: [mySqlDeployment.chart]
 });

@@ -9,6 +9,7 @@ interface DeployPhpMyAdminArgs {
     mysqlPort: number;
     mysqlUser: string;
     mysqlPassword: string;
+    dependsOn?: pulumi.Input<pulumi.Resource>[];
 }
 
 export function deployPhpMyAdmin(args: DeployPhpMyAdminArgs) {
@@ -30,7 +31,7 @@ export function deployPhpMyAdmin(args: DeployPhpMyAdminArgs) {
                 port: 80,
             },
         },
-    }, { provider: args.provider });
+    }, { provider: args.provider, dependsOn: [...(args.dependsOn ?? [])] });
 
     return {
         chart

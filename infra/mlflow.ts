@@ -5,8 +5,11 @@ import * as pulumi from "@pulumi/pulumi";
 interface DeployMLflowArgs {
     name: string;
     provider: k8s.Provider;
+    auth: {
+        adminUsername: string,
+        adminPassword: string,
+    };
     db: {
-        dialectDriver: string;
         host: pulumi.Input<string>;
         port: number;
         user: string;
@@ -27,64 +30,70 @@ interface DeployMLflowArgs {
         existingSecret?: string;
         existingSecretKey?: string;
     };
+    dependsOn?: pulumi.Input<pulumi.Resource>[];
 }
 
 export function deployMLflow(args: DeployMLflowArgs) {
     const chartValues: any = {
-        postgresql: { enabled: false },
-        externalDatabase: {
-            dialectDriver: args.db.dialectDriver,
-            host: args.db.host,
-            port: args.db.port,
-            user: args.db.user,
-            password: args.db.password,
-            database: args.db.database,
+        flaskServerSecretKey: args.auth.adminPassword,
+        backendStore: {
+            databaseMigration: true,
+            databaseConnectionCheck: true,
+            mysql: {
+                enabled: true,
+                driver: "pymysql",
+                host: args.db.host,
+                port: args.db.port,
+                user: args.db.user,
+                password: args.db.password,
+                database: args.db.database,
+            }
         },
-        minio: {
-            enabled: false,
+        artifactRoot: {},
+        service: {
+            port: 5000,
+            type: "ClusterIP"
         },
-        tracking: {
+        auth: {
             enabled: true,
-            service: {
-                type: "ClusterIP",
-                ports: { http: 5000 },
-            },
-        },
+            adminUsername: args.auth.adminUsername,
+            adminPassword: args.auth.adminPassword
+        }
     };
 
     if (args.artifactBackend === "minio" && args.minio) {
-        chartValues.externalS3 = {
-            host: args.minio.host,
-            port: args.minio.port,
-            accessKeyID: args.minio.accessKey,
-            accessKeySecret: args.minio.secretKey,
-            bucket: args.minio.bucket,
-            protocol: "http",
-            serveArtifacts: true,
-            useCredentialsInSecret: false,
+        chartValues.artifactRoot = {
+            s3: {
+                enabled: true,
+                bucket: args.minio.bucket,
+                awsAccessKeyId: args.minio.accessKey,
+                awsSecretAccessKey: args.minio.secretKey,
+                path: "",
+            }
+        };
+        chartValues.extraEnvVars = {
+            MLFLOW_S3_ENDPOINT_URL: `http://${args.minio.host}:${args.minio.port}`
         };
     }
 
     if (args.artifactBackend === "gcs" && args.gcs) {
-        chartValues.externalGCS = {
-            bucket: args.gcs.bucket,
-            googleCloudProject: args.gcs.googleCloudProject || "",
-            serveArtifacts: true,
-            useCredentialsInSecret: true,
-            existingSecret: args.gcs.existingSecret,
-            existingSecretKey: args.gcs.existingSecretKey,
+        chartValues.artifactRoot = {
+            gcs: {
+                enabled: true,
+                bucket: args.gcs.bucket,
+                path: ""
+            }
         };
     }
 
     const chart = new helm.Chart(args.name, {
         chart: "mlflow",
-        version: "5.1.4",
+        version: "0.18.0",
         repositoryOpts: {
-            repo: "https://charts.bitnami.com/bitnami",
+            repo: "https://community-charts.github.io/helm-charts",
         },
         values: chartValues,
-    }, { provider: args.provider });
-
+    }, { provider: args.provider, dependsOn: [...(args.dependsOn ?? [])] });
 
     return { chart };
 }
