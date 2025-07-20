@@ -4,6 +4,7 @@ import * as helm from "@pulumi/kubernetes/helm/v3";
 interface DeployMLflowArgs {
     provider: k8s.Provider;
     db: {
+        dialectDriver: string;
         host: string;
         port: number;
         user: string;
@@ -30,7 +31,7 @@ export function deployMLflow(args: DeployMLflowArgs) {
     const chartValues: any = {
         postgresql: { enabled: false },
         externalDatabase: {
-            dialectDriver: "postgresql",
+            dialectDriver: args.db.dialectDriver,
             host: args.db.host,
             port: args.db.port,
             user: args.db.user,
@@ -70,7 +71,7 @@ export function deployMLflow(args: DeployMLflowArgs) {
         };
     }
 
-    return new helm.Chart("mlflow", {
+    const mlflowHelm = new helm.Chart("mlflow", {
         chart: "mlflow",
         version: "5.1.4",
         fetchOpts: {
@@ -78,4 +79,6 @@ export function deployMLflow(args: DeployMLflowArgs) {
         },
         values: chartValues,
     }, { provider: args.provider });
+
+    return mlflowHelm;
 }
