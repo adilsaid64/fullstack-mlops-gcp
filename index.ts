@@ -1,5 +1,5 @@
 import * as pulumi from "@pulumi/pulumi";
-import { k8sProvider } from "./infra/getK8sProvider";
+import { getK8sProvider } from "./infra/getK8sProvider";
 import { deployMinio } from "./infra/local/minio";
 import { deployMySql } from "./infra/local/mysql";
 import { deployMLflow } from "./infra/mlflow";
@@ -9,6 +9,10 @@ import { deployPhpMyAdmin } from "./infra/phpMyAdmin";
 // ideally this should be generated and stored safely, just a temp solution while building project
 const defaultUsername = "admin123"
 const defaultPassword = "password123"
+
+// fetch k8s provider dynamiclly based on stack, if stack is local, it fetches local minikube k8s provider
+// this allows you to test deploy applications to minikube
+const k8sProvider = getK8sProvider()
 
 // deploying a local mysql and object store for local dev, prod will use gcp, this will be controled by pulumi.getStack()
 const mySqlDeployment = deployMySql({

@@ -25,6 +25,3 @@ export function getK8sProvider(): k8s.Provider {
 
     throw new Error(`Unsupported stack: ${stack}`);
 }
-
-
-export const k8sProvider = getK8sProvider()
