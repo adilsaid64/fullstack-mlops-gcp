@@ -5,22 +5,26 @@ import { deployMySql } from "./infra/local/mysql";
 import { deployMLflow } from "./infra/mlflow";
 import { deployPhpMyAdmin } from "./infra/phpMyAdmin";
 
+// NOTE: not advised todo this, its just to make dev a little easier
+// ideally this should be generated and stored safely, just a temp solution while building project
+const defaultUsername = "admin123"
+const defaultPassword = "password123"
 
-// datastores
+// deploying a local mysql and object store for local dev, prod will use gcp, this will be controled by pulumi.getStack()
 const mySqlDeployment = deployMySql({
     name: `mysql-${pulumi.getStack()}`,
     provider: k8sProvider,
-    rootPassword: "password",
-    user: "admin",
-    userPassword: "password",
+    rootPassword: defaultPassword,
+    user: defaultUsername,
+    userPassword: defaultPassword,
     database: "mydb"
 })
 
 const minioDeployment = deployMinio({
     name: `minio-${pulumi.getStack()}`,
     provider: k8sProvider,
-    rootUser: "admin",
-    rootPassword: "password",
+    rootUser: defaultUsername,
+    rootPassword: defaultPassword,
     defaultBuckets: "mlflow,zenml",
 });
 
@@ -32,19 +36,19 @@ const mlflowDeployment = deployMLflow({
     provider: k8sProvider,
     artifactBackend: "minio",
     auth: {
-        adminUsername: "admin",
-        adminPassword: "password",
+        adminUsername: defaultUsername,
+        adminPassword: defaultPassword,
     },
     db: {
         host: dbHost,
         port: 3306,
-        user: "admin",
-        password: "password",
+        user: defaultUsername,
+        password: defaultPassword,
         database: "mydb"
     },
     minio: {
-        accessKey: "admin",
-        secretKey: "password",
+        accessKey: defaultUsername,
+        secretKey: defaultPassword,
         host: minioHost,
         port: 9000,
         bucket: "mlflow"
@@ -57,7 +61,7 @@ const phpMyAdmin = deployPhpMyAdmin({
     provider: k8sProvider,
     mysqlHost: dbHost,
     mysqlPort: 3306,
-    mysqlUser: "admin",
-    mysqlPassword: "password",
+    mysqlUser: defaultUsername,
+    mysqlPassword: defaultPassword,
     dependsOn: [mySqlDeployment.chart]
 });

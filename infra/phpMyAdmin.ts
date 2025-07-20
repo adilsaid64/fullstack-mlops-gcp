@@ -15,7 +15,7 @@ interface DeployPhpMyAdminArgs {
 export function deployPhpMyAdmin(args: DeployPhpMyAdminArgs) {
     const chart = new helm.Chart(args.name, {
         chart: "phpmyadmin",
-        version: "12.1.3",
+        version: "19.0.1",
         repositoryOpts: {
             repo: "https://charts.bitnami.com/bitnami",
         },
