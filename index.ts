@@ -1,44 +1,49 @@
 import * as pulumi from "@pulumi/pulumi";
-import { getK8sProvider } from "./infra/getK8sProvider";
-import { deployMinio } from "./infra/local/minio";
-import { deployMySql } from "./infra/local/mysql";
-import { deployMLflow } from "./infra/mlflow";
-import { deployPhpMyAdmin } from "./infra/phpMyAdmin";
 
-// NOTE: not advised todo this, its just to make dev a little easier
-// ideally this should be generated and stored safely, just a temp solution while building project
+import { MinioHelmChart, MinioHelmChartArgs } from "./infra/applications/k8s/helm/minio";
+import { MySqlHelmChart, MySqlHelmChartArgs } from "./infra/applications/k8s/helm/mysql";
+import { MlflowHelmChart, MLflowHelmChartArgs } from "./infra/applications/k8s/helm/mlflow";
+import { PhpMyAdminHelmChart, PhpMyAdminHelmChartArgs } from "./infra/applications/k8s/helm/phpMyAdmin";
+
+import { CustomCluster } from "./infra/components/CustomCluster/CustomCluster";
+
 const defaultUsername = "admin123"
 const defaultPassword = "password123"
 
-// fetch k8s provider dynamiclly based on stack, if stack is local, it fetches local minikube k8s provider
-// this allows you to test deploy applications to minikube
-const k8sProvider = getK8sProvider()
+const customCluster = CustomCluster.get('custom-cluster')
 
-// deploying a local mysql and object store for local dev, prod will use gcp, this will be controled by pulumi.getStack()
-const mySqlDeployment = deployMySql({
+const mysqlArgs: MySqlHelmChartArgs = {
     name: `mysql-${pulumi.getStack()}`,
-    provider: k8sProvider,
     rootPassword: defaultPassword,
     user: defaultUsername,
     userPassword: defaultPassword,
-    database: "mydb"
-})
+    database: "mydb",
+};
+const mysqlConfig = new MySqlHelmChart(mysqlArgs);
+customCluster.deployHelmChart("mysql", mysqlConfig.getHelmConfig());
 
-const minioDeployment = deployMinio({
+const minioArgs: MinioHelmChartArgs = {
     name: `minio-${pulumi.getStack()}`,
-    provider: k8sProvider,
     rootUser: defaultUsername,
     rootPassword: defaultPassword,
     defaultBuckets: "mlflow,zenml",
-});
+};
+const minioConfig = new MinioHelmChart(minioArgs);
+customCluster.deployHelmChart("minio", minioConfig.getHelmConfig());
 
 export const dbHost = `mysql-${pulumi.getStack()}.default.svc.cluster.local`;
 export const minioHost = `minio-${pulumi.getStack()}.default.svc.cluster.local`;
 
-const mlflowDeployment = deployMLflow({
-    name: `mlflow-${pulumi.getStack()}`,
-    provider: k8sProvider,
-    artifactBackend: "minio",
+const phpMyAdminArgs: PhpMyAdminHelmChartArgs = {
+    mysqlHost: dbHost,
+    mysqlPort: 3306,
+    mysqlUser: defaultUsername,
+    mysqlPassword: defaultPassword,
+};
+const phpMyAdminConfig = new PhpMyAdminHelmChart(phpMyAdminArgs);
+customCluster.deployHelmChart("phpmyadmin", phpMyAdminConfig.getHelmConfig());
+
+const mlflowArgs: MLflowHelmChartArgs = {
     auth: {
         adminUsername: defaultUsername,
         adminPassword: defaultPassword,
@@ -48,24 +53,17 @@ const mlflowDeployment = deployMLflow({
         port: 3306,
         user: defaultUsername,
         password: defaultPassword,
-        database: "mydb"
+        database: "mydb",
     },
+    artifactBackend: "minio",
     minio: {
-        accessKey: defaultUsername,
-        secretKey: defaultPassword,
         host: minioHost,
         port: 9000,
-        bucket: "mlflow"
+        accessKey: defaultUsername,
+        secretKey: defaultPassword,
+        bucket: "mlflow",
     },
-    dependsOn: [mySqlDeployment.chart, minioDeployment.chart]
-});
+};
 
-const phpMyAdmin = deployPhpMyAdmin({
-    name: `phpmyadmin-${pulumi.getStack()}`,
-    provider: k8sProvider,
-    mysqlHost: dbHost,
-    mysqlPort: 3306,
-    mysqlUser: defaultUsername,
-    mysqlPassword: defaultPassword,
-    dependsOn: [mySqlDeployment.chart]
-});
+const mlflowConfig = new MlflowHelmChart(mlflowArgs);
+customCluster.deployHelmChart("mlflow", mlflowConfig.getHelmConfig());
