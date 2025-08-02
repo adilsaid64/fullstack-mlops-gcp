@@ -1,35 +1,33 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as k8s from "@pulumi/kubernetes";
 
-export interface MySqlHelmChartArgs {
+export interface PostgresHelmChartArgs {
     name: string;
-    rootPassword: string;
-    user: string;
-    userPassword: string;
-    database: string;
+    postgresPassword: string;
+    postgresUser: string;
+    postgresDatabase: string;
 }
 
-export class MySqlHelmChart {
-    constructor(private args: MySqlHelmChartArgs) { }
+export class PostgresHelmChart {
+    constructor(private args: PostgresHelmChartArgs) { }
 
     getHelmConfig(): k8s.helm.v4.ChartArgs {
         return {
-            chart: "mysql",
-            version: "13.0.4",
+            chart: "postgresql",
+            version: "12.5.7",
             repositoryOpts: {
                 repo: "https://charts.bitnami.com/bitnami",
             },
             values: {
                 auth: {
-                    rootPassword: this.args.rootPassword,
-                    username: this.args.user,
-                    password: this.args.userPassword,
-                    database: this.args.database,
+                    postgresPassword: this.args.postgresPassword,
+                    username: this.args.postgresUser,
+                    database: this.args.postgresDatabase,
                 },
                 primary: {
                     service: {
                         ports: {
-                            mysql: 3306,
+                            postgresql: 5432,
                         },
                     },
                     persistence: {

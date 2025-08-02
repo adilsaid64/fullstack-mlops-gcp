@@ -1,5 +1,4 @@
 import * as k8s from "@pulumi/kubernetes";
-import * as helm from "@pulumi/kubernetes/helm/v4";
 import * as pulumi from "@pulumi/pulumi";
 
 export interface MLflowHelmChartArgs {
@@ -28,6 +27,7 @@ export interface MLflowHelmChartArgs {
         existingSecret?: string;
         existingSecretKey?: string;
     };
+    versionTag: string;
 }
 
 export class MlflowHelmChart {
@@ -35,7 +35,6 @@ export class MlflowHelmChart {
 
     getHelmConfig(): k8s.helm.v4.ChartArgs {
         const values: any = {
-            flaskServerSecretKey: this.args.auth.adminPassword,
             backendStore: {
                 mysql: {
                     enabled: true,
@@ -56,6 +55,10 @@ export class MlflowHelmChart {
                 adminUsername: this.args.auth.adminUsername,
                 adminPassword: this.args.auth.adminPassword,
             },
+            image: {
+                repository: 'ghcr.io/burakince/mlflow',
+                tag: this.args.versionTag,
+            }
         };
 
         if (this.args.artifactBackend === "minio" && this.args.minio) {
@@ -83,7 +86,6 @@ export class MlflowHelmChart {
 
         return {
             chart: "mlflow",
-            version: "0.18.0",
             repositoryOpts: {
                 repo: "https://community-charts.github.io/helm-charts",
             },

@@ -1,10 +1,11 @@
 import * as pulumi from "@pulumi/pulumi";
 
-import { MinioHelmChart, MinioHelmChartArgs } from "./infra/applications/k8s/helm/minio";
-import { MySqlHelmChart, MySqlHelmChartArgs } from "./infra/applications/k8s/helm/mysql";
-import { MlflowHelmChart, MLflowHelmChartArgs } from "./infra/applications/k8s/helm/mlflow";
-import { PhpMyAdminHelmChart, PhpMyAdminHelmChartArgs } from "./infra/applications/k8s/helm/phpMyAdmin";
-
+import { MinioHelmChart, MinioHelmChartArgs } from "./infra/applications/k8s/helm/templates/minio";
+import { PostgresHelmChartArgs, PostgresHelmChart } from "./infra/applications/k8s/helm/templates/postgres";
+import { MlflowHelmChart, MLflowHelmChartArgs } from "./infra/applications/k8s/helm/templates/mlflow";
+import { PhpMyAdminHelmChart, PhpMyAdminHelmChartArgs } from "./infra/applications/k8s/helm/templates/phpMyAdmin";
+import { PrometheusGrafanaChart, PrometheusGrafanaChartConfig } from "./infra/applications/k8s/helm/templates/promethuesGrafana";
+import { PrefectHelmChart, PrefectHelmChartArgs } from "./infra/applications/k8s/helm/templates/prefect";
 import { CustomCluster } from "./infra/components/CustomCluster/CustomCluster";
 
 const defaultUsername = "admin123"
@@ -12,15 +13,14 @@ const defaultPassword = "password123"
 
 const customCluster = CustomCluster.get('custom-cluster')
 
-const mysqlArgs: MySqlHelmChartArgs = {
-    name: `mysql-${pulumi.getStack()}`,
-    rootPassword: defaultPassword,
-    user: defaultUsername,
-    userPassword: defaultPassword,
-    database: "mydb",
+const postgresArgs: PostgresHelmChartArgs = {
+    name: `postgres-${pulumi.getStack()}`,
+    postgresPassword: defaultPassword,
+    postgresUser: defaultUsername,
+    postgresDatabase: "mydb",
 };
-const mysqlConfig = new MySqlHelmChart(mysqlArgs);
-customCluster.deployHelmChart("mysql", mysqlConfig.getHelmConfig());
+const postgresConfig = new PostgresHelmChart(postgresArgs);
+customCluster.deployHelmChart("postgres", postgresConfig.getHelmConfig());
 
 const minioArgs: MinioHelmChartArgs = {
     name: `minio-${pulumi.getStack()}`,
@@ -63,7 +63,37 @@ const mlflowArgs: MLflowHelmChartArgs = {
         secretKey: defaultPassword,
         bucket: "mlflow",
     },
+    versionTag: '2.22.1'
 };
 
-const mlflowConfig = new MlflowHelmChart(mlflowArgs);
-customCluster.deployHelmChart("mlflow", mlflowConfig.getHelmConfig());
+// const mlflowConfig = new MlflowHelmChart(mlflowArgs);
+// customCluster.deployHelmChart("mlflow", mlflowConfig.getHelmConfig());
+
+
+const prometheusGrafanaChartConfig = new PrometheusGrafanaChart({
+    version: "75.13.0",
+    grafanaPassword: "admin",
+});
+customCluster.deployHelmChart("monitoring", prometheusGrafanaChartConfig.getHelmConfig());
+
+
+// researching what orchestrator/pipeline tracker, and model server to use
+// between metaflow, kubeflow, bentoml, seldonai, kserve(ill go with this if i use kubeflow)
+
+
+const prefectChart = new PrefectHelmChart({
+    name: "prefect-server",
+    adminPassword: "supersecurepassword",
+    enableBasicAuth: false,
+    useBundledPostgres: true,
+    // postgres: {
+    //     username: defaultUsername,
+    //     password: defaultPassword,
+    //     host: "my-postgres-host",
+    //     port: 5432,
+    //     database: "prefectdb",
+    // },
+    version: "2025.7.22192212",
+});
+
+customCluster.deployHelmChart('prefect-server', prefectChart.getHelmConfig());
