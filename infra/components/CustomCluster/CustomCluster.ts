@@ -1,148 +1,305 @@
-import * as pulumi from "@pulumi/pulumi";
-import * as k8s from "@pulumi/kubernetes";
+import {
+    all,
+    ComponentResource,
+    interpolate,
+    Output,
+    getStack,
+    type ComponentResourceOptions,
+    type Input,
+    type ResourceOptions,
+} from '@pulumi/pulumi';
+import * as kubernetes from "@pulumi/kubernetes";
 import * as fs from "fs";
 import * as os from "os";
-
-const __pulumiType = "custom:k8s:CustomCluster";
+import { isLocal } from '../../utils/utils';
 
 export interface CustomClusterArgs {
-    kubeconfig: pulumi.Input<string>;
+    tags?: Record<string, string>;
 }
 
-export class CustomCluster extends pulumi.ComponentResource {
-    public readonly kubeconfig: pulumi.Input<string>;
-    public readonly provider: k8s.Provider;
+export interface GetCustomClusterArgs {
+    region: string;
+    clusterId: string;
+}
 
-    constructor(name: string, args: CustomClusterArgs, opts?: pulumi.ComponentResourceOptions) {
+export interface CreateNamespaceArgs {
+    namespaceArgs: kubernetes.core.v1.NamespaceArgs;
+}
+
+export interface DeployApplicationViaHelmChartArgs {
+    releaseArgs: kubernetes.helm.v3.ReleaseArgs;
+}
+
+export interface DeployApplicationViaManifestArgs {
+    deploymentArgs: kubernetes.apps.v1.DeploymentArgs;
+    serviceArgs: kubernetes.core.v1.ServiceArgs;
+}
+
+export interface DeployStatefulApplicationArgs {
+    deploymentArgs: kubernetes.apps.v1.StatefulSetArgs;
+    serviceArgs: kubernetes.core.v1.ServiceArgs;
+    discoveryServiceArgs: kubernetes.core.v1.ServiceArgs;
+}
+
+export interface DeployIngressArgs {
+    ingressArgs: kubernetes.networking.v1.IngressArgs;
+}
+
+export interface CreateServiceAccountArgs {
+    serviceAccountArgs: kubernetes.core.v1.ServiceAccountArgs;
+}
+
+export interface BindClusterRoleToServiceAccountArgs {
+    clusterRoleBindingArgs: kubernetes.rbac.v1.ClusterRoleBindingArgs;
+}
+
+export interface CreateSecretArgs {
+    secretArgs: kubernetes.core.v1.SecretArgs;
+}
+
+export interface CreateStorageClassArgs {
+    storageClassArgs: kubernetes.storage.v1.StorageClassArgs;
+}
+
+export interface CreateIngressClassArgs {
+    ingressClassArgs: kubernetes.networking.v1.IngressClassArgs;
+}
+
+export interface CreateCustomResourceArgs {
+    customResourceArgs: kubernetes.apiextensions.CustomResourceArgs;
+}
+
+const __pulumiType = 'myproject:infra:CustomCluster';
+
+export class CustomCluster extends ComponentResource {
+    public provider: kubernetes.Provider;
+    public kubeconfig: Input<string>;
+    public clusterName: Input<string>;
+
+    constructor(name: string, args?: CustomClusterArgs, opts?: ComponentResourceOptions) {
         super(__pulumiType, name, args, opts);
 
-        this.kubeconfig = args.kubeconfig;
-
-        this.provider = new k8s.Provider(`${name}-provider`, {
-            kubeconfig: this.kubeconfig,
-        }, { parent: this });
+        // Provision Cloud Cluster here
+        this.kubeconfig = undefined!;
+        this.provider = undefined!;
+        this.clusterName = undefined!;
 
         this.registerOutputs({
             kubeconfig: this.kubeconfig,
             provider: this.provider,
+            clusterName: this.clusterName,
         });
     }
 
-    static get(name: string, opts?: pulumi.ComponentResourceOptions): CustomCluster {
-        const stack = pulumi.getStack();
+    static get(name: string, args?: GetCustomClusterArgs, opts?: ComponentResourceOptions): CustomCluster {
+        const stack = getStack();
 
-        if (stack === "local") {
+        const instance = new CustomCluster(name, undefined, opts);
+
+        if (isLocal()) {
+            // ifee local stack then use locala minikube clusters
             const kubeconfigPath = `${os.homedir()}/.kube/config`;
             const kubeconfig = fs.readFileSync(kubeconfigPath, "utf8");
+            instance.kubeconfig = kubeconfig
+            instance.provider = new kubernetes.Provider(
+                `${name}-local-provider`,
+                {
+                    kubeconfig: kubeconfig,
+                    context: 'minikube',
+                },
+                { parent: instance },
+            );
 
-            return new CustomCluster(name, { kubeconfig }, opts);
+            return instance;
+        } else {
+            throw new Error(`[CustomCluster.get] Unsupported stack: ${stack}`);
         }
-
-        throw new Error(`[CustomCluster.get] Unsupported stack: ${stack}`);
     }
 
     public createNamespace(
         name: string,
-        args: k8s.core.v1.NamespaceArgs,
-        opts?: pulumi.ResourceOptions
-    ): k8s.core.v1.Namespace {
-        return new k8s.core.v1.Namespace(name, args, {
+        args: CreateNamespaceArgs,
+        opts?: Omit<ResourceOptions, 'provider' | 'parent'>,
+    ): kubernetes.core.v1.Namespace {
+        return new kubernetes.core.v1.Namespace(name, args.namespaceArgs, {
             provider: this.provider,
             parent: this,
             ...opts,
         });
     }
 
-    public deployHelmChart(
+    public deployApplicationViaHelmChart(
         name: string,
-        args: k8s.helm.v4.ChartArgs,
-        opts?: pulumi.ResourceOptions
-    ): k8s.helm.v4.Chart {
-        return new k8s.helm.v4.Chart(name, args, {
-            provider: this.provider,
-            parent: this,
-            ...opts,
-        });
+        args: DeployApplicationViaHelmChartArgs,
+        opts?: Omit<ResourceOptions, 'provider' | 'parent'>,
+    ): kubernetes.helm.v3.Release {
+        return new kubernetes.helm.v3.Release(name, args.releaseArgs, { provider: this.provider, parent: this, ...opts });
     }
 
-    public deployManifest(
+    public deployApplicationViaManifest(
         name: string,
-        deploymentArgs: k8s.apps.v1.DeploymentArgs,
-        serviceArgs: k8s.core.v1.ServiceArgs,
-        opts?: pulumi.ResourceOptions
+        args: DeployApplicationViaManifestArgs,
+        opts?: Omit<ResourceOptions, 'provider' | 'parent'>,
     ) {
-        const deployment = new k8s.apps.v1.Deployment(name, deploymentArgs, {
+        const deployment = new kubernetes.apps.v1.Deployment(name, args.deploymentArgs, {
             provider: this.provider,
             parent: this,
             ...opts,
         });
 
-        const service = new k8s.core.v1.Service(name, serviceArgs, {
+        const service = new kubernetes.core.v1.Service(name, args.serviceArgs, {
             provider: this.provider,
             parent: this,
             ...opts,
         });
 
-        return { deployment, service };
+        return { deployment: deployment, service: service };
     }
 
-    public deployIngress(
+    public deployStatefulApplication(
         name: string,
-        args: k8s.networking.v1.IngressArgs,
-        opts?: pulumi.ResourceOptions
-    ): k8s.networking.v1.Ingress {
-        return new k8s.networking.v1.Ingress(name, args, {
+        args: DeployStatefulApplicationArgs,
+        opts?: Omit<ResourceOptions, 'provider' | 'parent'>,
+    ) {
+        const deployment = new kubernetes.apps.v1.StatefulSet(name, args.deploymentArgs, {
             provider: this.provider,
             parent: this,
+            ...opts,
+        });
+
+        const service = new kubernetes.core.v1.Service(`${name}-core`, args.serviceArgs, {
+            provider: this.provider,
+            parent: this,
+            ...opts,
+        });
+
+        const discoveryService = new kubernetes.core.v1.Service(`${name}-dscvr`, args.discoveryServiceArgs, {
+            provider: this.provider,
+            parent: this,
+            ...opts,
+        });
+        return { deployment: deployment, service: service, discoveryService: discoveryService };
+    }
+
+    public deployIngress(name: string, args: DeployIngressArgs, opts?: Omit<ResourceOptions, 'provider' | 'parent'>) {
+        return new kubernetes.networking.v1.Ingress(name, args.ingressArgs, {
+            provider: this.provider,
+            parent: this,
+            deleteBeforeReplace: true,
             ...opts,
         });
     }
 
     public createServiceAccount(
         name: string,
-        args: k8s.core.v1.ServiceAccountArgs,
-        opts?: pulumi.ResourceOptions
-    ): k8s.core.v1.ServiceAccount {
-        return new k8s.core.v1.ServiceAccount(name, args, {
+        args: CreateServiceAccountArgs,
+        opts?: Omit<ResourceOptions, 'provider' | 'parent'>,
+    ) {
+        return new kubernetes.core.v1.ServiceAccount(name, args.serviceAccountArgs, {
             provider: this.provider,
             parent: this,
             ...opts,
         });
     }
 
-    public bindClusterRole(
+    public bindClusterRoleToServiceAccount(
         name: string,
-        args: k8s.rbac.v1.ClusterRoleBindingArgs,
-        opts?: pulumi.ResourceOptions
-    ): k8s.rbac.v1.ClusterRoleBinding {
-        return new k8s.rbac.v1.ClusterRoleBinding(name, args, {
+        args: BindClusterRoleToServiceAccountArgs,
+        opts?: Omit<ResourceOptions, 'provider' | 'parent'>,
+    ) {
+        return new kubernetes.rbac.v1.ClusterRoleBinding(name, args.clusterRoleBindingArgs, {
             provider: this.provider,
             parent: this,
             ...opts,
         });
     }
 
-    public createSecret(
-        name: string,
-        args: k8s.core.v1.SecretArgs,
-        opts?: pulumi.ResourceOptions
-    ): k8s.core.v1.Secret {
-        return new k8s.core.v1.Secret(name, args, {
-            provider: this.provider,
-            parent: this,
-            ...opts,
-        });
+    public createK8sSecret(name: string, args: CreateSecretArgs, opts?: Omit<ResourceOptions, 'provider' | 'parent'>) {
+        return new kubernetes.core.v1.Secret(name, args.secretArgs, { provider: this.provider, parent: this, ...opts });
     }
 
     public createStorageClass(
         name: string,
-        args: k8s.storage.v1.StorageClassArgs,
-        opts?: pulumi.ResourceOptions
-    ): k8s.storage.v1.StorageClass {
-        return new k8s.storage.v1.StorageClass(name, args, {
+        args: CreateStorageClassArgs,
+        opts?: Omit<ResourceOptions, 'provider' | 'parent'>,
+    ) {
+        return new kubernetes.storage.v1.StorageClass(name, args.storageClassArgs, {
+            parent: this,
+            provider: this.provider,
+            ...opts,
+        });
+    }
+
+    public createIngressClass(
+        name: string,
+        args: CreateIngressClassArgs,
+        opts?: Omit<ResourceOptions, 'provider' | 'parent'>,
+    ) {
+        return new kubernetes.networking.v1.IngressClass(name, args.ingressClassArgs, {
+            parent: this,
+            provider: this.provider,
+            ...opts,
+        });
+    }
+
+    public createCustomResource(
+        name: string,
+        args: CreateCustomResourceArgs,
+        opts?: Omit<ResourceOptions, 'provider' | 'parent'>,
+    ) {
+        return new kubernetes.apiextensions.CustomResource(name, args.customResourceArgs, {
             provider: this.provider,
             parent: this,
             ...opts,
         });
     }
+
+    public getNamespace(
+        name: string,
+        id: string,
+        opts?: Omit<ResourceOptions, 'provider' | 'parent'>,
+    ): kubernetes.core.v1.Namespace {
+        return kubernetes.core.v1.Namespace.get(name, id, {
+            provider: this.provider,
+            parent: this,
+            ...opts,
+        });
+    }
+
+    public getServiceAccount(
+        name: string,
+        id: string,
+        opts?: Omit<ResourceOptions, 'provider' | 'parent'>,
+    ): kubernetes.core.v1.ServiceAccount {
+        return kubernetes.core.v1.ServiceAccount.get(name, id, {
+            provider: this.provider,
+            parent: this,
+            ...opts,
+        });
+    }
+
+    public getService(
+        name: string,
+        id: Input<string>,
+        opts?: Omit<ResourceOptions, 'provider' | 'parent'>,
+    ): kubernetes.core.v1.Service {
+        return kubernetes.core.v1.Service.get(name, id, {
+            provider: this.provider,
+            parent: this,
+            ...opts,
+        });
+    }
+
+    public getSecret(
+        name: string,
+        id: Input<string>,
+        opts?: Omit<ResourceOptions, 'provider' | 'parent'>,
+    ): kubernetes.core.v1.Secret {
+        return kubernetes.core.v1.Secret.get(name, id, {
+            provider: this.provider,
+            parent: this,
+            ...opts,
+        });
+    }
+
 }
