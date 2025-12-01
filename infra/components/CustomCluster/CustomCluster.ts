@@ -1,8 +1,5 @@
 import {
-    all,
     ComponentResource,
-    interpolate,
-    Output,
     getStack,
     type ComponentResourceOptions,
     type Input,
@@ -79,7 +76,7 @@ export class CustomCluster extends ComponentResource {
     constructor(name: string, args?: CustomClusterArgs, opts?: ComponentResourceOptions) {
         super(__pulumiType, name, args, opts);
 
-        // Provision Cloud Cluster here
+        // Provision a EKS cluster from your fav cloud provider
         this.kubeconfig = undefined!;
         this.provider = undefined!;
         this.clusterName = undefined!;

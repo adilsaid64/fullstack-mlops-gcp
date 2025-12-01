@@ -1,1 +1,1 @@
-export * from './infra/global'
+export * from './infra/shared'
