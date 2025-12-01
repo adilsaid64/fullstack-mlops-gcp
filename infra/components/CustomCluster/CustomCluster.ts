@@ -97,7 +97,7 @@ export class CustomCluster extends ComponentResource {
         const instance = new CustomCluster(name, undefined, opts);
 
         if (isLocal()) {
-            // ifee local stack then use locala minikube clusters
+            // if local stack then use locala minikube clusters
             const kubeconfigPath = `${os.homedir()}/.kube/config`;
             const kubeconfig = fs.readFileSync(kubeconfigPath, "utf8");
             instance.kubeconfig = kubeconfig

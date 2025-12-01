@@ -1,5 +1,6 @@
 import { CustomCluster } from "../components/CustomCluster/CustomCluster";
 import { shouldDeploySharedInfra } from "../utils/utils"
+import { getStack } from "@pulumi/pulumi";
 
 const clusterName = 'customClusters'
 

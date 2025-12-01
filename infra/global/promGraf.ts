@@ -1,8 +1,6 @@
 import { PrometheusGrafanaChart } from "../applications/k8s/helm/templates/promethuesGrafana";
 import { isLocal, shouldDeploySharedInfra } from "../utils/utils";
 import { customCluster } from "./cluster";
-import { defaultPassword } from './secrets'
-
 
 function deployPromethuesAndGrafana() {
     // deploy to shared infra and local stacks
@@ -10,12 +8,12 @@ function deployPromethuesAndGrafana() {
         // deploy promethues to cluster
         const prometheusGrafanaChartConfig = new PrometheusGrafanaChart({
             version: "75.13.0",
-            grafanaPassword: defaultPassword,
+            grafanaPassword: 'Password123!',
         });
         const monitoring = customCluster.deployApplicationViaHelmChart("monitoring", { releaseArgs: prometheusGrafanaChartConfig.getHelmConfig() });
         return monitoring
     } else {
-        // get promethues deployment
+        // preview stacks and non shared stacks dont need a their own deployments
         return undefined;
     }
 }
