@@ -4,15 +4,23 @@ import { customCluster } from "../cluster";
 import { monitoringNs } from "./monitoringNs";
 
 function deployPromethuesAndGrafana() {
+
     // deploy to shared infra and local stacks
     if (shouldDeploySharedInfra() || isLocal()) {
+
         // deploy promethues to cluster
         const prometheusGrafanaChartConfig = new PrometheusGrafanaChart({
             version: "75.13.0",
             grafanaPassword: 'Password123!',
             namespace: monitoringNs.metadata.namespace,
         });
-        const promGrafana = customCluster.deployApplicationViaHelmChart("prom-grafana-helm", { releaseArgs: prometheusGrafanaChartConfig.getHelmConfig() });
+
+        const promGrafana = customCluster.deployApplicationViaHelmChart("prom-grafana-helm", {
+            releaseArgs: prometheusGrafanaChartConfig.getHelmConfig()
+        }, {
+            dependsOn: monitoringNs
+        });
+
         return promGrafana
     } else {
         // preview stacks and non shared stacks dont need a their own deployments
