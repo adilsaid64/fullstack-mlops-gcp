@@ -1,2 +1,3 @@
 export * from './cluster'
-export * from './promGraf'
+export * from './monitoring/promGraf'
+export * from './monitoring/monitoringNs'

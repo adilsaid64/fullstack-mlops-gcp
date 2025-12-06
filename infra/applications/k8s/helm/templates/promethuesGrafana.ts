@@ -1,9 +1,10 @@
 import * as k8s from "@pulumi/kubernetes";
+import { Input } from "@pulumi/pulumi";
 
 export interface PrometheusGrafanaChartConfig {
     version: string;
     grafanaPassword: string;
-    namespace?: string;
+    namespace?: Input<string>;
     serviceType?: "ClusterIP" | "NodePort" | "LoadBalancer";
     serviceAccountName?: string;
     nodeSelector?: Record<string, string>;
