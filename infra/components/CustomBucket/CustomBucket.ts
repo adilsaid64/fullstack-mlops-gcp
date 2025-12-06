@@ -25,4 +25,12 @@ export class CustomBucket extends ComponentResource {
             bucketName: this.bucketName,
         });
     }
+
+    static get(name: string) {
+        if (isLocal()) {
+            // fetch minio bucket
+        } else {
+            // fetch bucket from cloud prodiver
+        }
+    }
 }
